@@ -8,4 +8,4 @@ this project currently uses the [platformIO](http://platformio.org/) code builde
   osc_udpsend.pd > puredata UDP/OSC send [source](http://en.flossmanuals.net/pure-data/ch065_osc/)
 
 
-, so the file structure is a bit different. if you want to use this in a standard arduino IDE copy and rename the files in the src folder to conform.
+note: platformIO uses Scons (python build system) so the file structure is a bit different. if you want to use this in a standard Arduino IDE copy and rename the files in the src folder to conform.

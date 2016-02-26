@@ -1,83 +1,48 @@
-/*
-  WiFi UDP Send and Receive String
-
- This sketch wait an UDP packet on localPort using a WiFi shield.
- When a packet is received an Acknowledge packet is sent to the client on port remotePort
-
- Circuit:
- * WiFi shield attached
-
- created 30 December 2012
- by dlf (Metodo2 srl)
-
- */
-
-
+//send OSC message to PD
+// based on ESP8266sendMessage.ino
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
+#include <OSCMessage.h>
+#include <Streaming.h>
 
 int status = WL_IDLE_STATUS;
 char ssid[] = "Gauge anomaly";
 char pass[] = "fuckingpassword";
 
-unsigned int localPort = 2390;      // local port to listen on
+const IPAddress outIp(192,168,1,114);        // remote IP of your computer
+const unsigned int outPort = 9999;          // remote port to receive OSC
+const unsigned int localPort = 8888;        // local port to listen for OSC packets (actually not used for sending)
 
-char packetBuffer[255]; //buffer to hold incoming packet
-char  ReplyBuffer[] = "acknowledged";       // a string to send back
-
-WiFiUDP Udp;
+WiFiUDP udp;
 
 void setup() {
-  //Initialize serial and wait for port to open:
-  Serial.begin(9600);
-  while (!Serial) {
-    ; // wait for serial port to connect. Needed for native USB port only
-  }
-  // attempt to connect to Wifi network:
-  while (status != WL_CONNECTED) {
-    Serial.print("Attempting to connect to SSID: ");
-    Serial.println(ssid);
-    // Connect to WPA/WPA2 network. Change this line if using open or WEP network:
-    status = WiFi.begin(ssid, pass);
+  Serial.begin(115200);
+  Serial.println();
+  Serial.println();
 
-    // wait 10 seconds for connection:
-    delay(10000);
+  // We start by connecting to a WiFi network
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+  WiFi.begin(ssid, pass);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
   }
-  Serial.println("Connected to wifi");
+  Serial.println("");
   printWifiStatus();
-
-  Serial.println("\nStarting connection to server...");
-  // if you get a connection, report back via serial:
-  Udp.begin(localPort);
 }
 
 void loop() {
-
-  // if there's data available, read a packet
-  int packetSize = Udp.parsePacket();
-  if (packetSize) {
-    Serial.print("Received packet of size ");
-    Serial.println(packetSize);
-    Serial.print("From ");
-    IPAddress remoteIp = Udp.remoteIP();
-    Serial.print(remoteIp);
-    Serial.print(", port ");
-    Serial.println(Udp.remotePort());
-
-    // read the packet into packetBufffer
-    int len = Udp.read(packetBuffer, 255);
-    if (len > 0) {
-      packetBuffer[len] = 0;
-    }
-    Serial.println("Contents:");
-    Serial.println(packetBuffer);
-
-    // send a reply, to the IP address and port that sent us the packet we received
-    Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-    Udp.write(ReplyBuffer);
-    Udp.endPacket();
-  }
+  OSCMessage msg("/test");
+  msg.add("hello, osc.");
+  udp.beginPacket(outIp, outPort);
+  msg.send(udp);
+  udp.endPacket();
+  msg.empty();
+  delay(500);
 }
+
 
 
 void printWifiStatus() {
@@ -86,13 +51,18 @@ void printWifiStatus() {
   Serial.println(WiFi.SSID());
 
   // print your WiFi shield's IP address:
-  IPAddress ip = WiFi.localIP();
-  Serial.print("IP Address: ");
-  Serial.println(ip);
+  Serial.println("WiFi connected");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
 
   // print the received signal strength:
   long rssi = WiFi.RSSI();
   Serial.print("signal strength (RSSI):");
   Serial.print(rssi);
   Serial.println(" dBm");
+
+  Serial.println("Starting UDP");
+  udp.begin(localPort);
+  Serial.print("Local port: ");
+  Serial.println(udp.localPort());
 }
