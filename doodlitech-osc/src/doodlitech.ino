@@ -1,16 +1,18 @@
 //send OSC message to PD
 // based on ESP8266sendMessage.ino
 
+#define DEBUG 0
+
 #include <ESP8266WiFi.h>
 
-//#include <WiFiUdp.h>
-//#include <OSCBundle.h>
+#include <WiFiUdp.h>
+#include <OSCBundle.h>
 #include <Streaming.h>
 
 #include <SFE_BMP180.h>
 #include <Wire.h>
 SFE_BMP180 pressure;
-/*
+
 int status = WL_IDLE_STATUS;
 char ssid[] = "Gauge anomaly";
 char pass[] = "fuckingpassword";
@@ -20,10 +22,10 @@ const unsigned int outPort = 9999;          // remote port to receive OSC
 const unsigned int localPort = 8888;        // local port to listen for OSC packets (actually not used for sending)
 
 WiFiUDP udp;
-*/
+
 void setup() {
   Serial.begin(115200);
-/*
+
   // We start by connecting to a WiFi network
   Serial.print("Connecting to ");
   Serial.println(ssid);
@@ -35,7 +37,7 @@ void setup() {
   }
   Serial.println("");
   printWifiStatus();
-*/
+
   // the yellow is SCL, white is SDA
   if (pressure.begin(D1, D2))   //Wire.begin(int sda, int scl
     Serial << "BMP180 init success" << endl;
@@ -71,9 +73,8 @@ void loop() {
   Function returns 1 if successful, 0 if failure.
   */
   pressure.getPressure(Press, Temp);
-  Serial<<  Temp <<  " : " << Press << endl; // Print out the measurement:
-}
-/*
+  if (DEBUG) Serial<<  Temp <<  " : " << Press << endl; // Print out the measurement:
+
   OSCBundle bnd1;
   bnd1.add("/pressure").add(Press);
   bnd1.add("/temp").add(Temp);
@@ -108,4 +109,3 @@ void printWifiStatus() {
   Serial.print("Local port: ");
   Serial.println(udp.localPort());
 }
-*/
