@@ -6,8 +6,10 @@
 #include <ESP8266WiFi.h>
 
 #include <WiFiUdp.h>
-#include <OSCBundle.h>
 #include <Streaming.h>
+
+//#include <OSCMessage.h>
+#include <OSCBundle.h>
 
 #include <SFE_BMP180.h>
 #include <Wire.h>
@@ -73,14 +75,21 @@ void loop() {
   Function returns 1 if successful, 0 if failure.
   */
   pressure.getPressure(Press, Temp);
-  if (DEBUG) Serial<<  Temp <<  " : " << Press << endl; // Print out the measurement:
-
+  if(DEBUG) Serial<<  Temp <<  " : " << Press << endl; // Print out the measurement:
+/*
+  OSCMessage msg("/p");
+    msg.add((int)Press);
+    udp.beginPacket(outIp, outPort);
+    msg.send(udp);
+    udp.endPacket();
+    msg.empty();
+*/
   OSCBundle bnd1;
-  bnd1.add("/pressure").add(Press);
-  bnd1.add("/temp").add(Temp);
+  bnd1.add("/pressure").add((int)Press);
+  bnd1.add("/temp").add((int)Temp);
 
   udp.beginPacket(outIp, outPort);
-    bnd1.send(udp);
+  bnd1.send(udp);
   udp.endPacket();
   bnd1.empty();
 

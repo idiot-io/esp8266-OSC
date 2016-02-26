@@ -254,7 +254,7 @@ char SFE_BMP180::getTemperature(double &T)
 
 		a = c5 * (tu - c6);
 		T = a + (mc / (a + md));
-		
+
 		//Serial.print("tu: "); Serial.println(tu);
 
 	}
@@ -331,7 +331,8 @@ char SFE_BMP180::getPressure(double &P, double &T)
 		//example from http://wmrx00.sourceforge.net/Arduino/BMP085-Calcs.pdf, pu = 0x982FC0;
 		//pu = (0x98 * 256.0) + 0x2F + (0xC0/256.0);
 
-		s = T - 25.0;
+		//s = T - 25.0;
+		s = 28.0 - 25.0;
 		x = (x2 * pow(s,2)) + (x1 * s) + x0;
 		y = (y2 * pow(s,2)) + (y1 * s) + y0;
 		z = (pu - x) / y;
