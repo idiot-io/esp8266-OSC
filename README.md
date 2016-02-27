@@ -9,3 +9,5 @@ this project currently uses the [platformIO](http://platformio.org/) code builde
 
 
 note: platformIO uses Scons (python build system) so the file structure is a bit different. if you want to use this in a standard Arduino IDE copy and rename the files in the src folder to conform.
+
+![](http://i.imgur.com/OdV1QGF.jpg)
